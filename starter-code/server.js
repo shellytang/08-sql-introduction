@@ -56,8 +56,7 @@ app.post('/articles/insert', function(request, response) {
         request.body.authorUrl,
         request.body.category,
         request.body.publishedOn,
-        request.body.body
-      ],
+        request.body.body],
       // DONE: Get each value from the request's body
 
       function(err) {
@@ -77,16 +76,24 @@ app.put('/articles/update', function(request, response) {
 
     client.query(
       // DONE: Write the SQL query to update an existing record
-      `UPDATE articles(id PRIMARY KEY, title, author, "authorURL", category, publishedOn, body)
-      SET VALUES($1,$2,$3,$4,$5,$6)`,
-      [
-        request.body.title,
-        request.body.author,
-        request.body.authorUrl,
-        request.body.category,
-        request.body.publishedOn,
-        request.body.body
-      ]
+      `UPDATE articles
+       SET
+        title = $1,
+        author = $2,
+        "authorURL" = $3,
+        category = $5,
+        publishedOn = 5,
+        body = $6,
+       WHERE [id = $7]`,
+
+       [
+         request.body.title,
+         request.body.author,
+         request.body.authorUrl,
+         request.body.category,
+         request.body.publishedOn,
+         request.body.body],
+
       // DONE: Get each value from the request's body
       function(err) {
         if (err) console.error(err);
@@ -104,7 +111,8 @@ app.delete('/articles/delete', function(request, response) {
     if (err) console.error(err);
 
     client.query(
-      'DELETE FROM articles WHERE articles(id PRIMARY KEY, title, author, "authorURL", category, publishedOn, body) SET VALUES($1,$2,$3,$4,$5,$6)',
+      `DELETE FROM articles
+      WHERE id = ${request.body.id}`;
 
       // DONE: Write the SQL query to delete a record
       function(err) {
