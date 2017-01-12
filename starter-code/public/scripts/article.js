@@ -37,39 +37,34 @@ Article.loadAll = function(rows) {
 // If the DB has data already, we'll load up the data (sorted!), and then hand off control to the View.
 Article.fetchAll = function(callback) {
   $.get('/articles/all')
-  .then(
-    function(results) {
-      if (results.rows.length) { // If records exist in the DB
-        loadAll(results, function (callback) {
-
-        }
+  .then(function(results) {
+    if (results.rows.length) { // If records exist in the DB
+      Article.loadAll(results.rows);
+      callback();
         // DONE: Call loadAll, and pass in the results, then invoke the callback.
-
-       else { // if NO records exist in the DB
+    } else { // if NO records exist in the DB
         // DONE: Make an ajax call to get the json
-        $.getJSON('starter-code/public/data/hackerIpsum.json').then(function(results) {
-          for(var key in results){
-            this[key]=results[key];
-            article = new Article ();
-          }
-          });
-        });
-
-        // THEN() iterate over the results, and create a new Article object for each.
-        article.prototype.insertRecord();
+      $.getJSON('/data/hackerIpsum.json')
+        .then(function(data) {
+          data.forEach(function(item) {
+            console.log(item);
+            var article = new Article (item);
+            article.insertRecord(item);
+            console.log(item);
+          })
+        })
+          // THEN() iterate over the results, and create a new Article object for each.
           // When that's complete call the insertRecord method for each article you've created.
-        this.then(Article.fetchAll(callback()))
-        // THEN() invoke fetchAll and pass your callback as an argument
-        // Don't forget to CATCH() any errors
-        $.catch(function(err){
-          console.log(err);
-        }
-      }
+          // THEN() invoke fetchAll and pass your callback as an argument
+          .then(Article.fetchAll(callback())
+          // Don't forget to CATCH() any errors
+          .catch(function(err){
+            console.log(err);
+          })
+          )
     }
   })
-};
-
-
+}
 // REVIEW: Lets take a few minutes and review what each of these new methods do in relation to our server and DB
 Article.truncateTable = function(callback) {
   $.ajax({
@@ -87,7 +82,7 @@ Article.prototype.insertRecord = function(callback) {
   .then(function(data) {
     console.log(data);
     if (callback) callback();
-  })
+  });
 };
 
 Article.prototype.deleteRecord = function(callback) {
@@ -104,8 +99,8 @@ Article.prototype.deleteRecord = function(callback) {
 
 Article.prototype.updateRecord = function(callback) {
   $.ajax({
-    url: '/articles/delete',
-    method: 'DELETE',
+    url: '/articles/update',
+    method: 'UPDATE',
     data: {
       author: this.author,
       authorUrl: this.authorUrl,
